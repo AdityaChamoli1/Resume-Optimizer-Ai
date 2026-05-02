@@ -9,6 +9,8 @@ const floatingChips = [
 
 const HeroSection = () => {
   const navigate = useNavigate();
+
+  return (
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden mesh-gradient">
       {/* Floating keyword chips */}
       <div className="absolute inset-0 pointer-events-none">
