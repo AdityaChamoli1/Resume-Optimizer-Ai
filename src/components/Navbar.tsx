@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -35,10 +37,10 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
+          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => navigate("/auth")}>
             Log in
           </Button>
-          <Button size="sm" className="glow-primary">
+          <Button size="sm" className="glow-primary" onClick={() => navigate("/optimizer")}>
             Get Started Free
           </Button>
         </div>
@@ -67,7 +69,7 @@ const Navbar = () => {
                   {l.label}
                 </a>
               ))}
-              <Button size="sm" className="mt-2 w-full">Get Started Free</Button>
+              <Button size="sm" className="mt-2 w-full" onClick={() => { navigate("/optimizer"); setOpen(false); }}>Get Started Free</Button>
             </div>
           </motion.div>
         )}
