@@ -1,8 +1,10 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const CTASection = () => {
+  const navigate = useNavigate();
   return (
     <section className="py-24">
       <div className="container">
@@ -20,7 +22,7 @@ const CTASection = () => {
             <p className="text-muted-foreground max-w-md mx-auto mb-8">
               Join thousands of job seekers who've boosted their ATS scores and landed more interviews.
             </p>
-            <Button size="lg" className="glow-primary text-base px-8 gap-2">
+            <Button size="lg" className="glow-primary text-base px-8 gap-2" onClick={() => navigate("/optimizer")}>
               Optimize My Resume Free <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
