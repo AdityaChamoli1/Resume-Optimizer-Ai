@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      optimizations: {
+        Row: {
+          ats_score: number | null
+          company: string | null
+          cover_letter: string | null
+          created_at: string
+          id: string
+          interview_questions: Json | null
+          job_description: string
+          job_title: string | null
+          keyword_match_rate: number | null
+          matched_keywords: string[] | null
+          missing_keywords: string[] | null
+          optimized_resume: Json | null
+          original_resume: string
+          readability_score: number | null
+          skill_gaps: Json | null
+          skills_coverage: number | null
+          status: string
+          suggestions: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ats_score?: number | null
+          company?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          interview_questions?: Json | null
+          job_description: string
+          job_title?: string | null
+          keyword_match_rate?: number | null
+          matched_keywords?: string[] | null
+          missing_keywords?: string[] | null
+          optimized_resume?: Json | null
+          original_resume: string
+          readability_score?: number | null
+          skill_gaps?: Json | null
+          skills_coverage?: number | null
+          status?: string
+          suggestions?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ats_score?: number | null
+          company?: string | null
+          cover_letter?: string | null
+          created_at?: string
+          id?: string
+          interview_questions?: Json | null
+          job_description?: string
+          job_title?: string | null
+          keyword_match_rate?: number | null
+          matched_keywords?: string[] | null
+          missing_keywords?: string[] | null
+          optimized_resume?: Json | null
+          original_resume?: string
+          readability_score?: number | null
+          skill_gaps?: Json | null
+          skills_coverage?: number | null
+          status?: string
+          suggestions?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          optimizations_used: number
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          optimizations_used?: number
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          optimizations_used?: number
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
