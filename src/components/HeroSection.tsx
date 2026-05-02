@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const floatingChips = [
   "React", "Python", "SQL", "Agile", "AWS", "Leadership", "TypeScript", "Product Management",
 ];
 
 const HeroSection = () => {
-  return (
+  const navigate = useNavigate();
     <section className="relative min-h-screen flex items-center pt-16 overflow-hidden mesh-gradient">
       {/* Floating keyword chips */}
       <div className="absolute inset-0 pointer-events-none">
@@ -66,7 +67,7 @@ const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <Button size="lg" className="glow-primary text-base px-8 gap-2">
+            <Button size="lg" className="glow-primary text-base px-8 gap-2" onClick={() => navigate("/optimizer")}>
               Optimize My Resume Free <ArrowRight className="h-4 w-4" />
             </Button>
             <Button variant="outline" size="lg" className="text-base px-8 gap-2 border-border text-muted-foreground hover:text-foreground">
