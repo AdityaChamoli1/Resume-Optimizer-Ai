@@ -102,7 +102,11 @@ const OptimizerPage = () => {
         .eq("id", opt.id);
 
       // Increment usage
-      await supabase.rpc("increment_optimizations", { user_id_param: user!.id }).catch(() => {});
+      await supabase
+        .from("profiles")
+        .update({ optimizations_used: (await supabase.from("profiles").select("optimizations_used").eq("id", user!.id).single()).data?.optimizations_used! + 1 })
+        .eq("id", user!.id)
+        .then(() => {});
 
       setResult(data);
       toast.success("Resume optimized successfully!");
