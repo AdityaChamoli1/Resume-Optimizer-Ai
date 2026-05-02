@@ -69,7 +69,7 @@ const Navbar = () => {
                   {l.label}
                 </a>
               ))}
-              <Button size="sm" className="mt-2 w-full">Get Started Free</Button>
+              <Button size="sm" className="mt-2 w-full" onClick={() => { navigate("/optimizer"); setOpen(false); }}>Get Started Free</Button>
             </div>
           </motion.div>
         )}
