@@ -20,6 +20,13 @@ const OptimizerPage = () => {
   const [result, setResult] = useState<any>(null);
   const [optimizationId, setOptimizationId] = useState<string | null>(null);
 
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.result) {
+      setResult(state.result);
+    }
+  }, [location.state]);
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
