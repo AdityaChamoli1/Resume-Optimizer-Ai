@@ -4,7 +4,8 @@ import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Zap, Plus, LogOut, FileText, TrendingUp, Clock, Trash2 } from "lucide-react";
+import { Zap, Plus, LogOut, FileText, TrendingUp, Clock, Trash2, FileDown } from "lucide-react";
+import { generateResumePDF } from "@/lib/generateResumePDF";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -219,9 +220,22 @@ const DashboardPage = () => {
 
                     <div className="flex gap-1">
                       {opt.status === "completed" && (
-                        <Button size="sm" variant="ghost" onClick={() => handleViewResult(opt.id)} className="text-primary">
-                          View
-                        </Button>
+                        <>
+                          <Button size="sm" variant="ghost" onClick={() => handleViewResult(opt.id)} className="text-primary">
+                            View
+                          </Button>
+                          <Button size="sm" variant="ghost" className="text-secondary" onClick={async () => {
+                            const { data } = await supabase.from("optimizations").select("optimized_resume, job_title").eq("id", opt.id).single();
+                            if (data?.optimized_resume) {
+                              generateResumePDF(data.optimized_resume, `resume-${(data.job_title || "optimized").replace(/\s+/g, "-")}.pdf`);
+                              toast.success("PDF downloaded!");
+                            } else {
+                              toast.error("No optimized resume found");
+                            }
+                          }}>
+                            <FileDown className="h-4 w-4" />
+                          </Button>
+                        </>
                       )}
                       <Button size="sm" variant="ghost" onClick={() => handleDelete(opt.id)} className="text-destructive hover:text-destructive">
                         <Trash2 className="h-4 w-4" />
