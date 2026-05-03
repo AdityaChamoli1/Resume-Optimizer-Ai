@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Download, Copy } from "lucide-react";
+import { Download, Copy, FileDown } from "lucide-react";
+import { generateResumePDF } from "@/lib/generateResumePDF";
 
 interface OptimizedResumeViewProps {
   result: any;
@@ -71,7 +72,10 @@ const OptimizedResumeView = ({ result }: OptimizedResumeViewProps) => {
             <Copy className="h-4 w-4" /> Copy
           </Button>
           <Button size="sm" variant="outline" onClick={handleDownloadTxt} className="gap-1">
-            <Download className="h-4 w-4" /> Download TXT
+            <Download className="h-4 w-4" /> TXT
+          </Button>
+          <Button size="sm" className="gap-1 glow-primary" onClick={() => { generateResumePDF(resume); toast.success("PDF downloaded!"); }}>
+            <FileDown className="h-4 w-4" /> PDF
           </Button>
         </div>
       </div>
