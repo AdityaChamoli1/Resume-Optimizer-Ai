@@ -9,9 +9,72 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { jobDescription, resumeText, action } = await req.json();
+    const body = await req.json();
+    const { action } = body;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Handle text extraction from files using AI
+    if (action === "extract-text") {
+      const { fileBase64, fileName, fileType } = body;
+      if (!fileBase64) throw new Error("No file data provided");
+
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            {
+              role: "system",
+              content: "You are a document text extractor. Extract ALL text content from the provided document/image. Return ONLY a JSON object: {\"text\": \"<extracted text>\"}. Preserve formatting, sections, and structure as much as possible."
+            },
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: `Extract all text from this ${fileType} file named "${fileName}". Return only valid JSON with a "text" field.`
+                },
+                {
+                  type: "image_url",
+                  image_url: {
+                    url: `data:application/${fileType === "pdf" ? "pdf" : fileType === "docx" ? "vnd.openxmlformats-officedocument.wordprocessingml.document" : "octet-stream"};base64,${fileBase64}`
+                  }
+                }
+              ]
+            }
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        console.error("AI extract error:", response.status);
+        return new Response(JSON.stringify({ text: null, error: "Failed to extract text" }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content || "";
+      try {
+        const cleanContent = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+        const parsed = JSON.parse(cleanContent);
+        return new Response(JSON.stringify({ text: parsed.text }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      } catch {
+        // Return raw content as text
+        return new Response(JSON.stringify({ text: content }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    const { jobDescription, resumeText, tone } = body;
 
     let systemPrompt = "";
     let userPrompt = "";
@@ -77,7 +140,15 @@ Return a JSON object with this EXACT structure:
 
       userPrompt = `JOB DESCRIPTION:\n${jobDescription}\n\nRESUME:\n${resumeText}\n\nAnalyze and optimize this resume for the job description. Return ONLY valid JSON.`;
     } else if (action === "cover-letter") {
-      systemPrompt = `You are a professional cover letter writer. Generate a tailored cover letter based on the job description and resume. The letter should be professional, specific to the role, highlight relevant experience, and show enthusiasm. Keep it to 3-4 paragraphs. Return a JSON object: {"coverLetter": "<the full cover letter text>"}`;
+      const toneMap: Record<string, string> = {
+        professional: "professional and confident",
+        formal: "formal and traditional",
+        friendly: "warm and personable while remaining professional",
+        corporate: "polished corporate style suitable for Fortune 500",
+      };
+      const toneDesc = toneMap[tone || "professional"] || toneMap.professional;
+
+      systemPrompt = `You are a professional cover letter writer. Generate a tailored cover letter based on the job description and resume. The tone should be ${toneDesc}. The letter should be specific to the role, highlight relevant experience, and show enthusiasm. Keep it to 3-4 paragraphs. Return a JSON object: {"coverLetter": "<the full cover letter text>"}`;
       userPrompt = `JOB DESCRIPTION:\n${jobDescription}\n\nRESUME:\n${resumeText}\n\nWrite a tailored cover letter. Return ONLY valid JSON.`;
     } else if (action === "interview-questions") {
       systemPrompt = `You are an interview preparation expert. Based on the job description, generate likely interview questions. Return JSON:
@@ -125,7 +196,6 @@ Return a JSON object with this EXACT structure:
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || "";
 
-    // Parse the JSON from the response (strip markdown fences if present)
     let parsed;
     try {
       const cleanContent = content.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
