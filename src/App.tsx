@@ -9,13 +9,16 @@ import AuthPage from "./pages/AuthPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import OptimizerPage from "./pages/OptimizerPage";
 import DashboardPage from "./pages/DashboardPage";
+import ResumeBuilderPage from "./pages/ResumeBuilderPage";
+import LinkedInGeneratorPage from "./pages/LinkedInGeneratorPage";
+import CoverLetterPage from "./pages/CoverLetterPage";
+import InterviewPrepPage from "./pages/InterviewPrepPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
-
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -23,7 +26,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
-
   if (!user) return <Navigate to="/auth" replace />;
   return <>{children}</>;
 };
@@ -54,6 +56,10 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/optimizer" element={<ProtectedRoute><OptimizerPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilderPage /></ProtectedRoute>} />
+            <Route path="/linkedin-generator" element={<ProtectedRoute><LinkedInGeneratorPage /></ProtectedRoute>} />
+            <Route path="/cover-letter" element={<ProtectedRoute><CoverLetterPage /></ProtectedRoute>} />
+            <Route path="/interview-prep" element={<ProtectedRoute><InterviewPrepPage /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

@@ -74,12 +74,22 @@ serve(async (req) => {
       }
     }
 
-    const { jobDescription, resumeText, tone } = body;
+    const { jobDescription, resumeText, tone, topic, additionalContext } = body;
 
     let systemPrompt = "";
     let userPrompt = "";
 
-    if (action === "optimize") {
+    if (action === "linkedin-post") {
+      systemPrompt = `You are a LinkedIn content strategist and copywriter. Generate an engaging, SEO-friendly LinkedIn post based on the given topic and tone. The post should:
+- Be 150-300 words
+- Include relevant hashtags (3-5)
+- Use line breaks for readability
+- Include a compelling hook in the first line
+- End with a call to action or question
+Return JSON: {"post": "<the full post text>"}`;
+      const toneDesc = tone || "professional";
+      userPrompt = `Topic: ${topic}\nTone: ${toneDesc}\n${additionalContext ? `Additional context: ${additionalContext}` : ""}\n\nGenerate an engaging LinkedIn post. Return ONLY valid JSON.`;
+    } else if (action === "optimize") {
       systemPrompt = `You are an expert ATS resume optimizer and career consultant with 15+ years experience.
 
 Your task is to analyze a job description and resume, then provide a COMPLETE optimization.
