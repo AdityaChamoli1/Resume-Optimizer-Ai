@@ -19,7 +19,14 @@ interface Experience {
 interface Education {
   institution: string;
   degree: string;
-  year: string;
+  fieldOfStudy: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  grade: string;
+  activities: string;
+  description: string;
 }
 
 interface Project {
@@ -35,7 +42,7 @@ const ResumeBuilderPage = () => {
   const [summary, setSummary] = useState("");
   const [skills, setSkills] = useState("");
   const [experiences, setExperiences] = useState<Experience[]>([{ company: "", title: "", duration: "", bullets: [""] }]);
-  const [educations, setEducations] = useState<Education[]>([{ institution: "", degree: "", year: "" }]);
+  const [educations, setEducations] = useState<Education[]>([{ institution: "", degree: "", fieldOfStudy: "", startMonth: "", startYear: "", endMonth: "", endYear: "", grade: "", activities: "", description: "" }]);
   const [projects, setProjects] = useState<Project[]>([{ name: "", description: "" }]);
 
   const addExperience = () => setExperiences([...experiences, { company: "", title: "", duration: "", bullets: [""] }]);
@@ -46,7 +53,7 @@ const ResumeBuilderPage = () => {
     setExperiences(updated);
   };
 
-  const addEducation = () => setEducations([...educations, { institution: "", degree: "", year: "" }]);
+  const addEducation = () => setEducations([...educations, { institution: "", degree: "", fieldOfStudy: "", startMonth: "", startYear: "", endMonth: "", endYear: "", grade: "", activities: "", description: "" }]);
   const removeEducation = (i: number) => setEducations(educations.filter((_, idx) => idx !== i));
 
   const addProject = () => setProjects([...projects, { name: "", description: "" }]);
@@ -82,7 +89,7 @@ const ResumeBuilderPage = () => {
       txt += "\n";
     });
     txt += `SKILLS\n${skills}\n\nEDUCATION\n`;
-    educations.forEach(e => { txt += `${e.degree} - ${e.institution} (${e.year})\n`; });
+    educations.forEach(e => { txt += `${e.degree}${e.fieldOfStudy ? " in " + e.fieldOfStudy : ""} - ${e.institution} (${e.startMonth ? e.startMonth + " " : ""}${e.startYear || ""} - ${e.endMonth ? e.endMonth + " " : ""}${e.endYear || ""})\n`; });
     txt += "\nPROJECTS\n";
     projects.forEach(p => { txt += `${p.name}: ${p.description}\n`; });
 
@@ -207,21 +214,51 @@ const ResumeBuilderPage = () => {
                 <h3 className="font-display font-semibold text-foreground text-sm">Education</h3>
                 <Button variant="ghost" size="sm" onClick={addEducation} className="text-primary text-xs gap-1"><Plus className="h-3 w-3" />Add</Button>
               </div>
-              {educations.map((edu, i) => (
+              {educations.map((edu, i) => {
+                const updateEdu = (field: keyof Education, value: string) => { const u = [...educations]; u[i][field] = value; setEducations(u); };
+                const months = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const years = ["", ...Array.from({ length: 20 }, (_, j) => String(2030 - j))];
+                return (
                 <div key={i} className="p-3 rounded-xl bg-muted/20 border border-white/[0.04] space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground font-mono">#{i + 1}</span>
-                    {educations.length > 1 && (
-                      <Button variant="ghost" size="sm" onClick={() => removeEducation(i)} className="text-destructive h-6 w-6 p-0"><Trash2 className="h-3 w-3" /></Button>
-                    )}
+                    {educations.length > 1 && <Button variant="ghost" size="sm" onClick={() => removeEducation(i)} className="text-destructive h-6 w-6 p-0"><Trash2 className="h-3 w-3" /></Button>}
                   </div>
-                  <Input value={edu.degree} onChange={e => { const u = [...educations]; u[i].degree = e.target.value; setEducations(u); }} placeholder="Degree" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs" />
+                  <div><Label className="text-[10px] text-muted-foreground">School *</Label><Input value={edu.institution} onChange={e => updateEdu("institution", e.target.value)} placeholder="University / School name" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs mt-1" /></div>
                   <div className="grid grid-cols-2 gap-2">
-                    <Input value={edu.institution} onChange={e => { const u = [...educations]; u[i].institution = e.target.value; setEducations(u); }} placeholder="Institution" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs" />
-                    <Input value={edu.year} onChange={e => { const u = [...educations]; u[i].year = e.target.value; setEducations(u); }} placeholder="Year" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs" />
+                    <div><Label className="text-[10px] text-muted-foreground">Degree</Label><Input value={edu.degree} onChange={e => updateEdu("degree", e.target.value)} placeholder="e.g. Bachelor's" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs mt-1" /></div>
+                    <div><Label className="text-[10px] text-muted-foreground">Field of Study</Label><Input value={edu.fieldOfStudy} onChange={e => updateEdu("fieldOfStudy", e.target.value)} placeholder="e.g. Computer Science" className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs mt-1" /></div>
                   </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground">Start Date</Label>
+                      <div className="grid grid-cols-2 gap-1 mt-1">
+                        <select value={edu.startMonth} onChange={e => updateEdu("startMonth", e.target.value)} className="bg-muted/30 border border-white/[0.06] rounded-lg h-8 text-xs px-2 text-foreground">
+                          {months.map(m => <option key={m} value={m}>{m || "Month"}</option>)}
+                        </select>
+                        <select value={edu.startYear} onChange={e => updateEdu("startYear", e.target.value)} className="bg-muted/30 border border-white/[0.06] rounded-lg h-8 text-xs px-2 text-foreground">
+                          {years.map(y => <option key={y} value={y}>{y || "Year"}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] text-muted-foreground">End Date (or expected)</Label>
+                      <div className="grid grid-cols-2 gap-1 mt-1">
+                        <select value={edu.endMonth} onChange={e => updateEdu("endMonth", e.target.value)} className="bg-muted/30 border border-white/[0.06] rounded-lg h-8 text-xs px-2 text-foreground">
+                          {months.map(m => <option key={m} value={m}>{m || "Month"}</option>)}
+                        </select>
+                        <select value={edu.endYear} onChange={e => updateEdu("endYear", e.target.value)} className="bg-muted/30 border border-white/[0.06] rounded-lg h-8 text-xs px-2 text-foreground">
+                          {years.map(y => <option key={y} value={y}>{y || "Year"}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div><Label className="text-[10px] text-muted-foreground">Grade</Label><Input value={edu.grade} onChange={e => updateEdu("grade", e.target.value)} placeholder="e.g. 3.8 GPA" maxLength={80} className="bg-muted/30 border-white/[0.06] rounded-lg h-8 text-xs mt-1" /></div>
+                  <div><Label className="text-[10px] text-muted-foreground">Activities & Societies</Label><Textarea value={edu.activities} onChange={e => updateEdu("activities", e.target.value)} placeholder="Clubs, honors, sports..." maxLength={500} className="bg-muted/30 border-white/[0.06] rounded-lg text-xs h-16 resize-none mt-1" /></div>
+                  <div><Label className="text-[10px] text-muted-foreground">Description</Label><Textarea value={edu.description} onChange={e => updateEdu("description", e.target.value)} placeholder="Relevant coursework, thesis, achievements..." maxLength={1000} className="bg-muted/30 border-white/[0.06] rounded-lg text-xs h-16 resize-none mt-1" /></div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Projects */}
@@ -298,7 +335,7 @@ const ResumeBuilderPage = () => {
                     <div>
                       <h4 className="text-xs font-semibold text-primary uppercase tracking-wider mb-1">Education</h4>
                       {educations.filter(e => e.institution || e.degree).map((e, i) => (
-                        <p key={i} className="text-xs text-muted-foreground">{e.degree} — {e.institution} ({e.year})</p>
+                        <p key={i} className="text-xs text-muted-foreground">{e.degree}{e.fieldOfStudy ? ` in ${e.fieldOfStudy}` : ""} — {e.institution} {e.startYear || e.endYear ? `(${e.startYear || ""}–${e.endYear || ""})` : ""}</p>
                       ))}
                     </div>
                   )}
