@@ -19,7 +19,14 @@ interface Experience {
 interface Education {
   institution: string;
   degree: string;
-  year: string;
+  fieldOfStudy: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  grade: string;
+  activities: string;
+  description: string;
 }
 
 interface Project {
