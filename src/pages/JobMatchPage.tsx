@@ -64,15 +64,15 @@ const JobMatchPage = () => {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6 rounded-2xl space-y-6">
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center h-28 w-28 rounded-full border-4 border-primary/30 mb-3 relative">
-                    <svg className="absolute inset-0" viewBox="0 0 112 112"><circle cx="56" cy="56" r="52" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray={`${(result.ats_score || 0) * 3.27} 327`} strokeLinecap="round" transform="rotate(-90 56 56)" opacity="0.8" /></svg>
-                    <span className="text-3xl font-display font-bold text-primary">{result.ats_score || 0}%</span>
+                    <svg className="absolute inset-0" viewBox="0 0 112 112"><circle cx="56" cy="56" r="52" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeDasharray={`${(result.atsScore || 0) * 3.27} 327`} strokeLinecap="round" transform="rotate(-90 56 56)" opacity="0.8" /></svg>
+                    <span className="text-3xl font-display font-bold text-primary">{result.atsScore || 0}%</span>
                   </div>
                   <p className="text-sm font-semibold text-foreground">Overall Match Score</p>
-                  <p className="text-xs text-muted-foreground mt-1">{(result.ats_score || 0) >= 75 ? "Great match! Your resume aligns well." : (result.ats_score || 0) >= 50 ? "Good match with room for improvement." : "Low match — consider optimizing your resume."}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{(result.atsScore || 0) >= 75 ? "Great match! Your resume aligns well." : (result.atsScore || 0) >= 50 ? "Good match with room for improvement." : "Low match — consider optimizing your resume."}</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 text-center">
-                  {[{ l: "Keywords", v: result.keyword_match_rate }, { l: "Skills", v: result.skills_coverage }, { l: "Readability", v: result.readability_score }].map(m => (
+                  {[{ l: "Keywords", v: result.keywordMatchRate }, { l: "Skills", v: result.skillsCoverage }, { l: "Readability", v: result.readabilityScore }].map(m => (
                     <div key={m.l} className="p-3 rounded-xl bg-muted/20 border border-border/30">
                       <p className="text-lg font-bold text-primary font-mono">{m.v || 0}%</p>
                       <p className="text-[10px] text-muted-foreground">{m.l}</p>
@@ -80,19 +80,19 @@ const JobMatchPage = () => {
                   ))}
                 </div>
 
-                {result.matched_keywords?.length > 0 && (
+                {result.matchedKeywords?.length > 0 && (
                   <div><h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-400" />Skills You Have</h4>
-                  <div className="flex flex-wrap gap-1">{result.matched_keywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-green-500/10 text-green-400">{k}</Badge>)}</div></div>
+                  <div className="flex flex-wrap gap-1">{result.matchedKeywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-green-500/10 text-green-400">{k}</Badge>)}</div></div>
                 )}
 
-                {result.missing_keywords?.length > 0 && (
+                {result.missingKeywords?.length > 0 && (
                   <div><h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1"><XCircle className="h-3 w-3 text-red-400" />Skills to Add</h4>
-                  <div className="flex flex-wrap gap-1">{result.missing_keywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-red-500/10 text-red-400">{k}</Badge>)}</div></div>
+                  <div className="flex flex-wrap gap-1">{result.missingKeywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-red-500/10 text-red-400">{k}</Badge>)}</div></div>
                 )}
 
-                {result.skill_gaps && (
+                {result.skillGaps && (
                   <div><h4 className="text-xs font-semibold text-foreground mb-2">Skill Gap Analysis</h4>
-                  <p className="text-xs text-muted-foreground">{typeof result.skill_gaps === "string" ? result.skill_gaps : JSON.stringify(result.skill_gaps)}</p></div>
+                  <p className="text-xs text-muted-foreground">{typeof result.skillGaps === "string" ? result.skillGaps : JSON.stringify(result.skillGaps)}</p></div>
                 )}
               </motion.div>
             ) : (
