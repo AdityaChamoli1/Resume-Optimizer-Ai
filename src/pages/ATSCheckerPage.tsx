@@ -64,16 +64,16 @@ const ATSCheckerPage = () => {
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-6 rounded-2xl space-y-6">
                 <div className="text-center">
                   <div className="inline-flex items-center justify-center h-24 w-24 rounded-full bg-primary/10 border-2 border-primary mb-3">
-                    <span className="text-3xl font-display font-bold text-primary">{result.ats_score || 0}%</span>
+                    <span className="text-3xl font-display font-bold text-primary">{result.atsScore || 0}%</span>
                   </div>
                   <p className="text-sm font-semibold text-foreground">ATS Compatibility Score</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-3 text-center">
                   {[
-                    { label: "Keywords", value: `${result.keyword_match_rate || 0}%` },
-                    { label: "Skills", value: `${result.skills_coverage || 0}%` },
-                    { label: "Readability", value: `${result.readability_score || 0}%` },
+                    { label: "Keywords", value: `${result.keywordMatchRate || 0}%` },
+                    { label: "Skills", value: `${result.skillsCoverage || 0}%` },
+                    { label: "Readability", value: `${result.readabilityScore || 0}%` },
                   ].map(m => (
                     <div key={m.label} className="p-3 rounded-xl bg-muted/20 border border-border/30">
                       <p className="text-lg font-bold text-primary font-mono">{m.value}</p>
@@ -82,17 +82,17 @@ const ATSCheckerPage = () => {
                   ))}
                 </div>
 
-                {result.matched_keywords?.length > 0 && (
+                {result.matchedKeywords?.length > 0 && (
                   <div>
                     <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1"><CheckCircle2 className="h-3 w-3 text-green-400" />Matched Keywords</h4>
-                    <div className="flex flex-wrap gap-1">{result.matched_keywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-green-500/10 text-green-400">{k}</Badge>)}</div>
+                    <div className="flex flex-wrap gap-1">{result.matchedKeywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-green-500/10 text-green-400">{k}</Badge>)}</div>
                   </div>
                 )}
 
-                {result.missing_keywords?.length > 0 && (
+                {result.missingKeywords?.length > 0 && (
                   <div>
                     <h4 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1"><XCircle className="h-3 w-3 text-red-400" />Missing Keywords</h4>
-                    <div className="flex flex-wrap gap-1">{result.missing_keywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-red-500/10 text-red-400">{k}</Badge>)}</div>
+                    <div className="flex flex-wrap gap-1">{result.missingKeywords.map((k: string) => <Badge key={k} variant="secondary" className="text-[10px] bg-red-500/10 text-red-400">{k}</Badge>)}</div>
                   </div>
                 )}
 
