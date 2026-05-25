@@ -1,81 +1,28 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-
+import { Link } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
-import { Zap, Mail, Loader2 } from "lucide-react";
+import { Zap, Loader2 } from "lucide-react";
 
 const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { loginWithRedirect, isLoading } = useAuth0();
 
-  const handleEmailAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back!");
-        navigate("/dashboard");
-      } else {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName },
-            emailRedirectTo: window.location.origin,
-          },
-        });
-        if (error) throw error;
-        toast.success("Check your email to verify your account!");
-      }
-    } catch (err: any) {
-      toast.error(err.message || "Authentication failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/dashboard`,
-          queryParams: { prompt: "select_account" },
-        },
-      });
-      if (error) {
-        toast.error(error.message || "Google sign-in failed");
-      }
-      // On success, browser is redirected to Google; no further action needed.
-    } catch (err: any) {
-      toast.error(err?.message || "Google sign-in failed");
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!email) {
-      toast.error("Please enter your email first");
-      return;
-    }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+  const handleLogin = (screen_hint?: "signup") =>
+    loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: `${window.location.origin}/callback`,
+        ...(screen_hint ? { screen_hint } : {}),
+      },
+      appState: { returnTo: "/dashboard" },
     });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Password reset link sent to your email!");
-    }
-  };
+
+  const handleGoogle = () =>
+    loginWithRedirect({
+      authorizationParams: {
+        redirect_uri: `${window.location.origin}/callback`,
+        connection: "google-oauth2",
+      },
+      appState: { returnTo: "/dashboard" },
+    });
 
   return (
     <div className="min-h-screen bg-background mesh-gradient flex items-center justify-center p-4">
@@ -85,15 +32,14 @@ const AuthPage = () => {
             <Zap className="h-5 w-5 text-primary" />
             OptimizeForm AI
           </Link>
-          <p className="text-sm text-muted-foreground">
-            {isLogin ? "Sign in to your account" : "Create your account"}
-          </p>
+          <p className="text-sm text-muted-foreground">Sign in to your account</p>
         </div>
 
         <Button
           variant="outline"
-          className="w-full mb-6 gap-2 border-border text-foreground"
-          onClick={handleGoogleLogin}
+          className="w-full mb-4 gap-2 border-border text-foreground"
+          onClick={handleGoogle}
+          disabled={isLoading}
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -104,80 +50,14 @@ const AuthPage = () => {
           Continue with Google
         </Button>
 
-        <div className="relative mb-6">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-border" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">or</span>
-          </div>
-        </div>
+        <Button className="w-full glow-primary mb-3" onClick={() => handleLogin()} disabled={isLoading}>
+          {isLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+          Sign In with Email
+        </Button>
 
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          {!isLogin && (
-            <div>
-              <Label htmlFor="fullName" className="text-foreground">Full Name</Label>
-              <Input
-                id="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Doe"
-                className="mt-1 bg-muted border-border text-foreground"
-                required={!isLogin}
-              />
-            </div>
-          )}
-          <div>
-            <Label htmlFor="email" className="text-foreground">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="mt-1 bg-muted border-border text-foreground"
-              required
-            />
-          </div>
-          <div>
-            <Label htmlFor="password" className="text-foreground">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="mt-1 bg-muted border-border text-foreground"
-              required
-              minLength={6}
-            />
-          </div>
-
-          {isLogin && (
-            <button
-              type="button"
-              onClick={handleForgotPassword}
-              className="text-xs text-primary hover:underline"
-            >
-              Forgot password?
-            </button>
-          )}
-
-          <Button type="submit" className="w-full glow-primary gap-2" disabled={loading}>
-            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mail className="h-4 w-4" />}
-            {isLogin ? "Sign In" : "Create Account"}
-          </Button>
-        </form>
-
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-primary hover:underline font-medium"
-          >
-            {isLogin ? "Sign up" : "Sign in"}
-          </button>
-        </p>
+        <Button variant="ghost" className="w-full text-foreground" onClick={() => handleLogin("signup")} disabled={isLoading}>
+          Create an account
+        </Button>
       </div>
     </div>
   );
